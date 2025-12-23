@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
-import ProcessManagement from '../views/ProcessManagement.vue';
-import ProcessDesigner from '../views/ProcessDesigner.vue';
+import ProcessManagement from '@/business/process-management/ProcessManagement.vue';
+import ProcessDesigner from '@/business/process-designer/ProcessDesigner.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {

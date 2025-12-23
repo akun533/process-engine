@@ -39,45 +39,12 @@
       <div class="components-panel">
         <div class="panel-title">组件库</div>
         <div class="component-list">
-          <div 
-            class="component-item" 
-            draggable="true"
-            @dragstart="onDragStart($event, 'start')"
-          >
-            <div class="component-icon start-node"></div>
-            <div class="component-label">开始节点</div>
-          </div>
-          <div 
-            class="component-item" 
-            draggable="true"
-            @dragstart="onDragStart($event, 'rect')"
-          >
-            <div class="component-icon rect-node"></div>
-            <div class="component-label">矩形节点</div>
-          </div>
-          <div 
-            class="component-item" 
-            draggable="true"
-            @dragstart="onDragStart($event, 'circle')"
-          >
-            <div class="component-icon circle-node"></div>
-            <div class="component-label">圆形节点</div>
-          </div>
-          <div 
-            class="component-item" 
-            draggable="true"
-            @dragstart="onDragStart($event, 'diamond')"
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'user')"
           >
             <div class="component-icon diamond-node"></div>
             <div class="component-label">菱形节点</div>
-          </div>
-          <div 
-            class="component-item" 
-            draggable="true"
-            @dragstart="onDragStart($event, 'end')"
-          >
-            <div class="component-icon end-node"></div>
-            <div class="component-label">结束节点</div>
           </div>
         </div>
       </div>
@@ -91,8 +58,8 @@
       <div class="properties-panel">
         <div class="panel-title">属性配置</div>
         <div class="properties-content">
-          <a-form 
-            :model="nodeProperties" 
+          <a-form
+            :model="nodeProperties"
             layout="vertical"
             v-if="selectedNode"
           >
@@ -122,16 +89,17 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { message } from 'ant-design-vue';
-import { 
-  UndoOutlined, 
-  RedoOutlined, 
-  DeleteOutlined, 
-  SaveOutlined, 
-  EyeOutlined 
+import {
+  UndoOutlined,
+  RedoOutlined,
+  DeleteOutlined,
+  SaveOutlined,
+  EyeOutlined
 } from '@ant-design/icons-vue';
 import LogicFlow from '@logicflow/core';
 import '@logicflow/core/dist/index.css';
 import { useRoute } from 'vue-router';
+import { registerNodes } from '@/shared/components/nodes';
 
 const route = useRoute();
 const containerRef = ref<HTMLDivElement | null>(null);
@@ -147,14 +115,37 @@ const nodeProperties = ref({
 });
 
 let eventListener: any = null;
-
+const data = ref({
+  // 节点
+  nodes: [
+    {
+      id: 50,
+      type: 'rect',
+      x: 100,
+      y: 150,
+      text: '你好',
+    },
+    {
+      id: 21,
+      type: 'circle',
+      x: 300,
+      y: 150,
+    },
+  ],
+  // 边
+  edges: [
+    {
+      type: 'polyline',
+      sourceNodeId: 50,
+      targetNodeId: 21,
+    },
+  ],
+});
 // 初始化LogicFlow
 const initLogicFlow = () => {
   if (containerRef.value) {
     const lf = new LogicFlow({
       container: containerRef.value,
-      width: 'auto',
-      height: '100%',
       allowDrag: true,
       enableSelection: true,
       enableZoom: true,
@@ -168,21 +159,7 @@ const initLogicFlow = () => {
       },
     });
 
-    // 注册节点
-    lf.registerNode('start', {
-      width: 100,
-      height: 40,
-      fillColor: '#52C41A',
-      strokeColor: '#52C41A',
-    });
-    
-    lf.registerNode('end', {
-      width: 100,
-      height: 40,
-      fillColor: '#FF4D4F',
-      strokeColor: '#FF4D4F',
-    });
-
+    lf.render(data.value);
     // 监听节点选择事件
     eventListener = lf.on('element:click', ({ data }: any) => {
       if (data.type === 'node') {
@@ -196,15 +173,27 @@ const initLogicFlow = () => {
       }
     });
 
+    // 注册自定义节点
+    registerNodes(lf);
+
     lfRef.value = lf;
     canUndo.value = lf.undoAble;
     canRedo.value = lf.redoAble;
   }
 };
 
-// 拖拽开始事件
-const onDragStart = (event: DragEvent, nodeType: string) => {
-  event.dataTransfer?.setData('node-type', nodeType);
+// 开始拖拽节点
+const startDrag = (event: MouseEvent, nodeType: string) => {
+  event.preventDefault(); // 阻止默认行为
+  if (lfRef.value) {
+    lfRef.value.dnd.startDrag({
+      type: nodeType,
+      text: '用户节点',
+      properties: {
+        size: 1
+      }
+    });
+  }
 };
 
 // 撤销操作
@@ -245,7 +234,7 @@ const updateNodeProperties = () => {
     lfRef.value.setProperties(selectedNode.value.id, {
       fillColor: nodeProperties.value.fillColor
     });
-    
+
     lfRef.value.setElementText(selectedNode.value.id, nodeProperties.value.text);
     message.success('属性已更新');
   }
@@ -253,7 +242,7 @@ const updateNodeProperties = () => {
 
 onMounted(() => {
   initLogicFlow();
-  
+
   // 获取URL中的流程ID
   const processId = route.query.id;
   console.log('正在设计的流程ID:', processId);

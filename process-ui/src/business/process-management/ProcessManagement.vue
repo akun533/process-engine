@@ -111,19 +111,11 @@ import { ref, reactive, onMounted } from 'vue';
 import { message } from 'ant-design-vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import type { TableProps } from 'ant-design-vue';
-
-interface Process {
-  id: string;
-  name: string;
-  code: string;
-  description: string;
-  status: number; // 1: 启用, 0: 禁用
-  createTime: string;
-  updateTime: string;
-}
+import { Process, ProcessSearchForm, PaginationConfig, ProcessFormState } from '@/shared/types/process';
+import { getProcessList, createProcess, updateProcess, deleteProcess, searchProcess } from '@/shared/api/processApi';
 
 // 搜索表单
-const searchForm = reactive({
+const searchForm = reactive<ProcessSearchForm>({
   name: '',
   code: ''
 });
@@ -162,26 +154,7 @@ const columns = [
 ];
 
 // 流程数据
-const processList = ref<Process[]>([
-  {
-    id: '1',
-    name: '请假审批流程',
-    code: 'LEAVE-001',
-    description: '员工请假审批流程',
-    status: 1,
-    createTime: '2023-01-01 12:00:00',
-    updateTime: '2023-01-01 12:00:00'
-  },
-  {
-    id: '2',
-    name: '报销审批流程',
-    code: 'EXPENSE-001',
-    description: '员工差旅费用报销流程',
-    status: 1,
-    createTime: '2023-01-02 12:00:00',
-    updateTime: '2023-01-02 12:00:00'
-  }
-]);
+const processList = ref<Process[]>([]);
 
 const loading = ref(false);
 const modalVisible = ref(false);
@@ -190,25 +163,44 @@ const editingProcess = ref<Partial<Process>>({});
 const formRef = ref();
 
 // 分页配置
-const pagination = reactive({
+const pagination = reactive<PaginationConfig>({
   current: 1,
   pageSize: 10,
-  total: 2,
+  total: 0,
 });
 
 // 表单数据
-const formState = reactive({
+const formState = reactive<ProcessFormState>({
   name: '',
   code: '',
   description: '',
   status: true,
 });
 
+// 加载流程列表
+const loadProcessList = async () => {
+  loading.value = true;
+  try {
+    const result = await getProcessList({
+      page: pagination.current,
+      pageSize: pagination.pageSize,
+      search: searchForm
+    });
+    processList.value = result.list;
+    pagination.total = result.pagination.total;
+  } catch (error) {
+    console.error('加载流程列表失败:', error);
+    message.error('加载流程列表失败');
+  } finally {
+    loading.value = false;
+  }
+};
+
 // 处理搜索
-const handleSearch = () => {
+const handleSearch = async () => {
   console.log('搜索:', searchForm);
-  // 实际项目中这里会调用API进行搜索
-  message.success('触发搜索');
+  await loadProcessList();
+  message.success('搜索完成');
 };
 
 // 显示添加弹窗
@@ -243,35 +235,51 @@ const designProcess = (id: string) => {
 };
 
 // 删除流程
-const deleteProcess = (id: string) => {
-  // 实际项目中这里会调用API删除数据
-  console.log('删除流程:', id);
-  message.success('删除成功');
+const deleteProcess = async (id: string) => {
+  try {
+    await deleteProcess(id);
+    message.success('删除成功');
+    await loadProcessList(); // 重新加载数据
+  } catch (error) {
+    console.error('删除流程失败:', error);
+    message.error('删除流程失败');
+  }
 };
 
 // 提交表单
-const handleOk = () => {
-  formRef.value
-    .validate()
-    .then(() => {
-      confirmLoading.value = true;
-      
-      // 模拟保存数据
-      setTimeout(() => {
-        if (editingProcess.value.id) {
-          // 更新操作
-          message.success('更新成功');
-        } else {
-          // 新增操作
-          message.success('添加成功');
-        }
-        confirmLoading.value = false;
-        modalVisible.value = false;
-      }, 1000);
-    })
-    .catch(() => {
-      // 验证失败
-    });
+const handleOk = async () => {
+  try {
+    await formRef.value.validate();
+    confirmLoading.value = true;
+
+    if (editingProcess.value.id) {
+      // 更新操作
+      await updateProcess(editingProcess.value.id, {
+        name: formState.name,
+        code: formState.code,
+        description: formState.description,
+        status: formState.status ? 1 : 0
+      });
+      message.success('更新成功');
+    } else {
+      // 新增操作
+      await createProcess({
+        name: formState.name,
+        code: formState.code,
+        description: formState.description,
+        status: formState.status ? 1 : 0
+      });
+      message.success('添加成功');
+    }
+
+    confirmLoading.value = false;
+    modalVisible.value = false;
+    await loadProcessList(); // 重新加载数据
+  } catch (error) {
+    console.error('保存失败:', error);
+    message.error('保存失败');
+    confirmLoading.value = false;
+  }
 };
 
 // 取消表单
@@ -280,15 +288,15 @@ const handleCancel = () => {
 };
 
 // 表格分页变化
-const handleTableChange: TableProps['onChange'] = (pager) => {
+const handleTableChange: TableProps['onChange'] = async (pager) => {
   pagination.current = pager?.current || 1;
   pagination.pageSize = pager?.pageSize || 10;
-  // 实际项目中这里会重新加载数据
+  await loadProcessList();
 };
 
 // 组件挂载后初始化数据
-onMounted(() => {
-  // 实际项目中这里会调用API获取初始数据
+onMounted(async () => {
+  await loadProcessList();
 });
 </script>
 
