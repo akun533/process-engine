@@ -377,6 +377,10 @@ const updateNodeProperties = () => {
     // 更新节点文本
     lfRef.value.updateText(selectedNode.value.id, nodeProperties.value.text);
     
+    // 重新渲染整个流程图以确保样式更新
+    const graphData = lfRef.value.getGraphData();
+    lfRef.value.render(graphData);
+    
     message.success('属性已更新');
   }
 };
