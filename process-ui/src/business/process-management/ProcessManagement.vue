@@ -111,8 +111,8 @@ import { ref, reactive, onMounted } from 'vue';
 import { message } from 'ant-design-vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import type { TableProps } from 'ant-design-vue';
-import { Process, ProcessSearchForm, PaginationConfig, ProcessFormState } from '@/shared/types/process';
-import { getProcessList, createProcess, updateProcess, deleteProcess, searchProcess } from '@/shared/api/processApi';
+import type {Process, ProcessSearchForm, PaginationConfig, ProcessFormState} from '@/shared/types/process';
+import {getProcessList, createProcess, deleteProcessById, updateProcess} from '@/shared/api/processApi';
 
 // 搜索表单
 const searchForm = reactive<ProcessSearchForm>({
@@ -237,7 +237,7 @@ const designProcess = (id: string) => {
 // 删除流程
 const deleteProcess = async (id: string) => {
   try {
-    await deleteProcess(id);
+    await deleteProcessById(id);
     message.success('删除成功');
     await loadProcessList(); // 重新加载数据
   } catch (error) {

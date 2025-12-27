@@ -1,4 +1,4 @@
-import { Process, ProcessSearchForm, PaginationConfig } from '../types/process';
+import type {Process, ProcessSearchForm, PaginationConfig} from '@shared/types/process';
 
 // 模拟流程数据
 const mockProcessData: Process[] = [
@@ -85,13 +85,18 @@ export const createProcess = async (processData: Omit<Process, 'id' | 'createTim
 export const updateProcess = async (id: string, processData: Partial<Process>): Promise<Process> => {
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const index = mockProcessData.findIndex(item => item.id === id);
-  if (index !== -1) {
-    const updatedProcess = {
-      ...mockProcessData[index],
-      ...processData,
+  const process = mockProcessData.find(item => item.id === id);
+  if (process) {
+    const updatedProcess: Process = {
+      id: process.id,
+      name: processData.name ?? process.name,
+      code: processData.code ?? process.code,
+      description: processData.description ?? process.description,
+      status: processData.status ?? process.status,
+      createTime: process.createTime,
       updateTime: new Date().toISOString().slice(0, 19).replace('T', ' ')
     };
+    const index = mockProcessData.findIndex(item => item.id === id);
     mockProcessData[index] = updatedProcess;
     return updatedProcess;
   }
@@ -100,7 +105,7 @@ export const updateProcess = async (id: string, processData: Partial<Process>): 
 };
 
 // 删除流程
-export const deleteProcess = async (id: string): Promise<void> => {
+export const deleteProcessById = async (id: string): Promise<void> => {
   await new Promise(resolve => setTimeout(resolve, 500));
   const index = mockProcessData.findIndex(item => item.id === id);
   if (index !== -1) {

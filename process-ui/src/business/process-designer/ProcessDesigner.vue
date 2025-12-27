@@ -41,10 +41,59 @@
         <div class="component-list">
           <div
             class="component-item"
-            @mousedown="startDrag($event, 'user')"
+            @mousedown="startDrag($event, 'start')"
+          >
+            <div class="component-icon start-node"></div>
+            <div class="component-label">开始节点</div>
+          </div>
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'end')"
+          >
+            <div class="component-icon end-node"></div>
+            <div class="component-label">结束节点</div>
+          </div>
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'task')"
+          >
+            <div class="component-icon rect-node"></div>
+            <div class="component-label">任务节点</div>
+          </div>
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'decision')"
           >
             <div class="component-icon diamond-node"></div>
-            <div class="component-label">菱形节点</div>
+            <div class="component-label">决策节点</div>
+          </div>
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'data')"
+          >
+            <div class="component-icon parallelogram-node"></div>
+            <div class="component-label">数据节点</div>
+          </div>
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'document')"
+          >
+            <div class="component-icon document-node"></div>
+            <div class="component-label">文档节点</div>
+          </div>
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'storage')"
+          >
+            <div class="component-icon storage-node"></div>
+            <div class="component-label">存储节点</div>
+          </div>
+          <div
+            class="component-item"
+            @mousedown="startDrag($event, 'manual')"
+          >
+            <div class="component-icon manual-node"></div>
+            <div class="component-label">手动操作节点</div>
           </div>
         </div>
       </div>
@@ -72,7 +121,7 @@
             <a-form-item label="节点文本">
               <a-input v-model:value="nodeProperties.text" />
             </a-form-item>
-            <a-form-item label="节点颜色" v-if="nodeProperties.type !== 'start' && nodeProperties.type !== 'end'">
+            <a-form-item label="节点颜色" v-if="!['start', 'end'].includes(nodeProperties.type)">
               <a-input v-model:value="nodeProperties.fillColor" type="color" />
             </a-form-item>
             <a-button type="primary" @click="updateNodeProperties">更新属性</a-button>
@@ -186,12 +235,42 @@ const initLogicFlow = () => {
 const startDrag = (event: MouseEvent, nodeType: string) => {
   event.preventDefault(); // 阻止默认行为
   if (lfRef.value) {
+    let nodeText = '';
+    let nodeProperties = {};
+    
+    switch (nodeType) {
+      case 'start':
+        nodeText = '开始';
+        break;
+      case 'end':
+        nodeText = '结束';
+        break;
+      case 'task':
+        nodeText = '任务';
+        break;
+      case 'decision':
+        nodeText = '决策';
+        break;
+      case 'data':
+        nodeText = '数据';
+        break;
+      case 'document':
+        nodeText = '文档';
+        break;
+      case 'storage':
+        nodeText = '存储';
+        break;
+      case 'manual':
+        nodeText = '手动操作';
+        break;
+      default:
+        nodeText = '节点';
+    }
+    
     lfRef.value.dnd.startDrag({
       type: nodeType,
-      text: '用户节点',
-      properties: {
-        size: 1
-      }
+      text: nodeText,
+      properties: nodeProperties
     });
   }
 };
@@ -355,6 +434,51 @@ onBeforeUnmount(() => {
   height: 30px;
   background: #722ED1;
   transform: rotate(-45deg);
+}
+
+.parallelogram-node {
+  background: #9254DE;
+  transform: skew(-15deg);
+}
+
+.document-node {
+  background: #52C41A;
+  border-radius: 4px;
+  position: relative;
+}
+
+.document-node::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 5px;
+  right: 5px;
+  height: 10px;
+  border-radius: 0 0 4px 4px;
+  background: inherit;
+  transform: scaleY(0.5);
+}
+
+.storage-node {
+  background: #FA8C16;
+  border-radius: 15px;
+}
+
+.manual-node {
+  background: #FAAD14;
+  border-radius: 4px;
+  position: relative;
+}
+
+.manual-node::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 5px;
+  right: 5px;
+  height: 3px;
+  background: #FAAD14;
+  border-radius: 2px;
 }
 
 .component-label {
