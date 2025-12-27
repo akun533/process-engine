@@ -20,6 +20,8 @@ class StartModel extends CircleNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }
@@ -37,6 +39,8 @@ class EndModel extends CircleNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }
@@ -55,6 +59,8 @@ class TaskModel extends RectNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }
@@ -83,6 +89,8 @@ class DecisionModel extends PolygonNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }
@@ -105,6 +113,8 @@ class DataModel extends PolygonNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }
@@ -140,6 +150,8 @@ class DocumentModel extends RectNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }
@@ -179,6 +191,8 @@ class StorageModel extends RectNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }
@@ -226,6 +240,8 @@ class ManualModel extends RectNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
+    style.stroke = this.stroke;
+    style.fill = this.fill;
     return style;
   }
 }

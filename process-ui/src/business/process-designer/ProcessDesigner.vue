@@ -430,82 +430,136 @@ onBeforeUnmount(() => {
 }
 
 .start-node {
-  background: #52C41A;
-  border-radius: 4px;
+  width: 60px;
+  height: 60px;
+  border: 2px solid #52c41a;
+  background: #f6ffed;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .end-node {
-  background: #FF4D4F;
-  border-radius: 4px;
+  width: 60px;
+  height: 60px;
+  border: 2px solid #ff4d4f;
+  background: #fff1f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .rect-node {
-  background: #1890FF;
+  width: 80px;
+  height: 40px;
+  border: 2px solid #1890ff;
+  background: #e6f7ff;
   border-radius: 4px;
-}
-
-.circle-node {
-  background: #FA8C16;
-  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .diamond-node {
-  background: #722ED1;
+  width: 0;
+  height: 0;
+  border: none;
+  background: transparent;
+  border: 2px solid #ff7875;
+  background: #fff0f6;
+  width: 50px;
+  height: 50px;
   transform: rotate(45deg);
-  margin: 5px;
+  margin: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .diamond-node::before {
   content: '';
   position: absolute;
-  width: 30px;
-  height: 30px;
-  background: #722ED1;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #ff7875;
+  background: #fff0f6;
   transform: rotate(-45deg);
 }
 
 .parallelogram-node {
-  background: #9254DE;
+  width: 80px;
+  height: 40px;
+  background: #f9f0ff;
+  border: 2px solid #9254de;
   transform: skew(-15deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .document-node {
-  background: #52C41A;
-  border-radius: 4px;
+  width: 80px;
+  height: 40px;
+  background: #f6ffed;
+  border: 2px solid #52c41a;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .document-node::after {
   content: '';
   position: absolute;
   bottom: -5px;
-  left: 5px;
-  right: 5px;
+  left: 10px;
+  right: 10px;
   height: 10px;
+  border: 2px solid #52c41a;
+  border-top: none;
   border-radius: 0 0 4px 4px;
-  background: inherit;
-  transform: scaleY(0.5);
+  background: #f6ffed;
 }
 
 .storage-node {
-  background: #FA8C16;
+  width: 80px;
+  height: 40px;
+  background: #fff7e6;
+  border: 2px solid #fa8c16;
+  position: relative;
   border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .manual-node {
-  background: #FAAD14;
+  width: 80px;
+  height: 40px;
+  background: #fff2e8;
+  border: 2px solid #ffa940;
   border-radius: 4px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .manual-node::before {
   content: '';
   position: absolute;
   top: 10px;
-  left: 5px;
-  right: 5px;
+  left: 10px;
+  right: 10px;
   height: 3px;
-  background: #FAAD14;
+  background: #ffa940;
   border-radius: 2px;
 }
 
