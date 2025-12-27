@@ -247,9 +247,9 @@ const initLogicFlow = () => {
       nodeProperties.value = {
         id: data.id,
         type: data.type,
-        text: data.text?.value || data.text || '',
-        stroke: data.properties?.stroke || '#1890ff',
-        fill: data.properties?.fill || '#ffffff'
+        text: typeof data.text === 'string' ? data.text : (data.text?.value || ''),
+        stroke: data.properties?.stroke || getDefaultPropertiesByNodeType(data.type).stroke,
+        fill: data.properties?.fill || getDefaultPropertiesByNodeType(data.type).fill
       };
     });
 
@@ -287,7 +287,7 @@ const getDefaultPropertiesByNodeType = (nodeType: string) => {
 const startDrag = (event: MouseEvent, nodeType: string) => {
   event.preventDefault(); // 阻止默认行为
   if (lfRef.value) {
-    let nodeText = '';
+    let nodeText: string;
     
     switch (nodeType) {
       case 'start':
@@ -361,18 +361,21 @@ const preview = () => {
 // 更新节点属性
 const updateNodeProperties = () => {
   if (selectedNode.value && lfRef.value) {
-    // 更新节点文本和颜色属性
-    const newProperties: any = {
-      text: nodeProperties.value.text
-    };
-    
     // 只对非开始和结束节点更新颜色
     if (!['start', 'end'].includes(nodeProperties.value.type)) {
-      newProperties.stroke = nodeProperties.value.stroke;
-      newProperties.fill = nodeProperties.value.fill;
+      lfRef.value.setProperties(selectedNode.value.id, {
+        stroke: nodeProperties.value.stroke,
+        fill: nodeProperties.value.fill
+      });
+    } else {
+      // 对于开始和结束节点，只更新颜色的stroke（边框）
+      lfRef.value.setProperties(selectedNode.value.id, {
+        stroke: nodeProperties.value.stroke
+      });
     }
     
-    lfRef.value.setProperties(selectedNode.value.id, newProperties);
+    // 更新节点文本
+    lfRef.value.updateText(selectedNode.value.id, nodeProperties.value.text);
     
     message.success('属性已更新');
   }
@@ -404,10 +407,6 @@ onBeforeUnmount(() => {
   padding: 10px 20px;
   border-bottom: 1px solid #e8e8e8;
   background: #fff;
-}
-
-.toolbar .ant-btn {
-  margin-right: 10px;
 }
 
 .designer-content {
@@ -497,10 +496,6 @@ onBeforeUnmount(() => {
 }
 
 .diamond-node {
-  width: 0;
-  height: 0;
-  border: none;
-  background: transparent;
   border: 2px solid #ff7875;
   background: #fff0f6;
   width: 50px;
