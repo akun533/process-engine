@@ -150,6 +150,8 @@ import {
 } from '@ant-design/icons-vue';
 import LogicFlow from '@logicflow/core';
 import '@logicflow/core/dist/index.css';
+import { Menu } from '@logicflow/extension';
+import '@logicflow/extension/lib/style/index.css';
 import { useRoute } from 'vue-router';
 import { registerNodes } from '@/shared/components/nodes';
 
@@ -219,6 +221,7 @@ const data = ref({
     },
   ],
 });
+
 // 初始化LogicFlow
 const initLogicFlow = () => {
   if (containerRef.value) {
@@ -235,10 +238,94 @@ const initLogicFlow = () => {
       background: {
         color: '#F0F0F0',
       },
+      plugins: [Menu] // 启用菜单插件
     });
 
     // 注册自定义节点
     registerNodes(lf);
+    
+    // 配置菜单项
+    lf.extension.menu.setMenuConfig({
+      nodeMenu: [
+        {
+          text: '复制',
+          callback: (node) => {
+            // 开始和结束节点不允许复制
+            if (node.type === 'start' || node.type === 'end') {
+              message.warning('开始节点和结束节点不能复制');
+              return;
+            }
+            
+            // 创建新节点数据，位置稍微偏移
+            const newNodeData = {
+              ...node,
+              id: `${node.id}_copy_${Date.now()}`, // 生成新的唯一ID
+              x: node.x + 30, // 偏移位置
+              y: node.y + 30,
+            };
+            
+            // 处理文本属性
+            if (typeof node.text === 'string') {
+              newNodeData.text = `${node.text}_copy`; // 文本也加上副本标记
+            } else if (node.text && typeof node.text === 'object') {
+              newNodeData.text = {
+                ...node.text,
+                value: `${node.text.value || ''}_copy`,
+                x: node.text.x + 30, // 同时偏移文本位置
+                y: node.text.y + 30
+              };
+            } else {
+              newNodeData.text = `${node.properties?.text || '节点'}_copy`;
+            }
+
+            lf.addNode(newNodeData);
+            
+
+            message.success('节点已复制');
+          }
+        },
+        {
+          text: '删除',
+          callback: (node) => {
+            lf.deleteNode(node.id);
+            selectedNode.value = null; // 清除选中状态
+            message.success('节点已删除');
+          }
+        },
+        {
+          text: '编辑文案',
+          callback: (node) => {
+            // 这里可以打开编辑弹窗或执行其他操作
+            message.info('开始编辑文案');
+          }
+        }
+      ],
+      edgeMenu: [
+        {
+          text: '删除',
+          callback: (edge) => {
+            lf.deleteEdge(edge.id);
+            message.success('连线已删除');
+          }
+        },
+        {
+          text: '编辑文案',
+          callback: (edge) => {
+            message.info('开始编辑连线文案');
+          }
+        }
+      ],
+      graphMenu: [
+        {
+          text: '清空',
+          callback: () => {
+            lf.clearData();
+            selectedNode.value = null;
+            message.success('画布已清空');
+          }
+        }
+      ]
+    });
     
     lf.render(data.value);
     // 监听节点选择事件
