@@ -13,15 +13,22 @@ class StartNode extends CircleNode {
 class StartModel extends CircleNodeModel {
   constructor(data: any, graphModel: any) {
     super(data, graphModel);
-    this.stroke = '#52c41a';
-    this.fill = '#f6ffed';
+    this.stroke = data.properties?.stroke || '#52c41a';
+    this.fill = data.properties?.fill || '#f6ffed';
     this.r = 30;
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#52c41a';
+    this.fill = this.data?.properties?.fill || '#f6ffed';
+  }
+  
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }
@@ -32,15 +39,22 @@ class EndNode extends CircleNode {
 class EndModel extends CircleNodeModel {
   constructor(data: any, graphModel: any) {
     super(data, graphModel);
-    this.stroke = '#ff4d4f';
-    this.fill = '#fff1f0';
+    this.stroke = data.properties?.stroke || '#ff4d4f';
+    this.fill = data.properties?.fill || '#fff1f0';
     this.r = 30;
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#ff4d4f';
+    this.fill = this.data?.properties?.fill || '#fff1f0';
+  }
+  
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }
@@ -53,14 +67,21 @@ class TaskModel extends RectNodeModel {
     super(data, graphModel);
     this.width = 100;
     this.height = 50;
-    this.fill = '#e6f7ff';
-    this.stroke = '#1890ff';
+    this.stroke = data.properties?.stroke || '#1890ff';
+    this.fill = data.properties?.fill || '#e6f7ff';
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#1890ff';
+    this.fill = this.data?.properties?.fill || '#e6f7ff';
+  }
+  
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }
@@ -77,8 +98,8 @@ class DecisionNode extends PolygonNode {
 class DecisionModel extends PolygonNodeModel {
   constructor(data: any, graphModel: any) {
     super(data, graphModel);
-    this.fill = '#fff0f6';
-    this.stroke = '#ff7875';
+    this.stroke = data.properties?.stroke || '#ff7875';
+    this.fill = data.properties?.fill || '#fff0f6';
     this.points = [
       [50, 0],
       [100, 50],
@@ -86,11 +107,18 @@ class DecisionModel extends PolygonNodeModel {
       [0, 50],
     ];
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#ff7875';
+    this.fill = this.data?.properties?.fill || '#fff0f6';
+  }
+  
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }
@@ -101,8 +129,8 @@ class DataNode extends PolygonNode {
 class DataModel extends PolygonNodeModel {
   constructor(data: any, graphModel: any) {
     super(data, graphModel);
-    this.fill = '#f9f0ff';
-    this.stroke = '#9254de';
+    this.stroke = data.properties?.stroke || '#9254de';
+    this.fill = data.properties?.fill || '#f9f0ff';
     this.points = [
       [20, 0],
       [100, 0],
@@ -110,11 +138,18 @@ class DataModel extends PolygonNodeModel {
       [0, 50],
     ];
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#9254de';
+    this.fill = this.data?.properties?.fill || '#f9f0ff';
+  }
+  
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }
@@ -127,9 +162,16 @@ class DocumentModel extends RectNodeModel {
     super(data, graphModel);
     this.width = 100;
     this.height = 60;
-    this.fill = '#f6ffed';
-    this.stroke = '#52c41a';
+    this.stroke = data.properties?.stroke || '#52c41a';
+    this.fill = data.properties?.fill || '#f6ffed';
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#52c41a';
+    this.fill = this.data?.properties?.fill || '#f6ffed';
+  }
+  
   getShape() {
     const { x, y, width, height } = this;
     const r = 5;
@@ -150,8 +192,8 @@ class DocumentModel extends RectNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }
@@ -164,9 +206,16 @@ class StorageModel extends RectNodeModel {
     super(data, graphModel);
     this.width = 100;
     this.height = 60;
-    this.fill = '#fff7e6';
-    this.stroke = '#fa8c16';
+    this.stroke = data.properties?.stroke || '#fa8c16';
+    this.fill = data.properties?.fill || '#fff7e6';
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#fa8c16';
+    this.fill = this.data?.properties?.fill || '#fff7e6';
+  }
+  
   getShape() {
     const { x, y, width, height } = this;
     const r = 15;
@@ -191,8 +240,8 @@ class StorageModel extends RectNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }
@@ -205,9 +254,16 @@ class ManualModel extends RectNodeModel {
     super(data, graphModel);
     this.width = 100;
     this.height = 60;
-    this.fill = '#fff2e8';
-    this.stroke = '#ffa940';
+    this.stroke = data.properties?.stroke || '#ffa940';
+    this.fill = data.properties?.fill || '#fff2e8';
   }
+  
+  setAttributes() {
+    super.setAttributes();
+    this.stroke = this.data?.properties?.stroke || '#ffa940';
+    this.fill = this.data?.properties?.fill || '#fff2e8';
+  }
+  
   getShape() {
     const { x, y, width, height } = this;
     const lineY = y - height / 2 + 15;
@@ -230,7 +286,7 @@ class ManualModel extends RectNodeModel {
           x2: x + width / 2,
           y2: lineY,
           style: {
-            stroke: this.stroke,
+            stroke: this.data?.properties?.stroke || this.stroke,
             strokeWidth: 2,
           },
         }
@@ -240,8 +296,8 @@ class ManualModel extends RectNodeModel {
   getNodeStyle() {
     const style = super.getNodeStyle();
     style.strokeWidth = 2;
-    style.stroke = this.stroke;
-    style.fill = this.fill;
+    style.stroke = this.data?.properties?.stroke || this.stroke;
+    style.fill = this.data?.properties?.fill || this.fill;
     return style;
   }
 }

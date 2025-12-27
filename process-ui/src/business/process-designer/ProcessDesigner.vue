@@ -121,8 +121,11 @@
             <a-form-item label="节点文本">
               <a-input v-model:value="nodeProperties.text" />
             </a-form-item>
-            <a-form-item label="节点颜色" v-if="!['start', 'end'].includes(nodeProperties.type)">
-              <a-input v-model:value="nodeProperties.fillColor" type="color" />
+            <a-form-item label="节点边框颜色" v-if="!['start', 'end'].includes(nodeProperties.type)">
+              <a-input v-model:value="nodeProperties.stroke" type="color" />
+            </a-form-item>
+            <a-form-item label="节点填充颜色" v-if="!['start', 'end'].includes(nodeProperties.type)">
+              <a-input v-model:value="nodeProperties.fill" type="color" />
             </a-form-item>
             <a-button type="primary" @click="updateNodeProperties">更新属性</a-button>
           </a-form>
@@ -160,7 +163,8 @@ const nodeProperties = ref({
   id: '',
   type: '',
   text: '',
-  fillColor: '#ffffff'
+  stroke: '#1890ff',
+  fill: '#ffffff'
 });
 
 let eventListener: any = null;
@@ -244,7 +248,8 @@ const initLogicFlow = () => {
         id: data.id,
         type: data.type,
         text: data.text?.value || data.text || '',
-        fillColor: data.properties?.fillColor || '#ffffff'
+        stroke: data.properties?.stroke || '#1890ff',
+        fill: data.properties?.fill || '#ffffff'
       };
     });
 
@@ -254,12 +259,35 @@ const initLogicFlow = () => {
   }
 };
 
+// 获取节点类型的默认属性
+const getDefaultPropertiesByNodeType = (nodeType: string) => {
+  switch (nodeType) {
+    case 'start':
+      return { stroke: '#52c41a', fill: '#f6ffed' };
+    case 'end':
+      return { stroke: '#ff4d4f', fill: '#fff1f0' };
+    case 'task':
+      return { stroke: '#1890ff', fill: '#e6f7ff' };
+    case 'decision':
+      return { stroke: '#ff7875', fill: '#fff0f6' };
+    case 'data':
+      return { stroke: '#9254de', fill: '#f9f0ff' };
+    case 'document':
+      return { stroke: '#52c41a', fill: '#f6ffed' };
+    case 'storage':
+      return { stroke: '#fa8c16', fill: '#fff7e6' };
+    case 'manual':
+      return { stroke: '#ffa940', fill: '#fff2e8' };
+    default:
+      return { stroke: '#1890ff', fill: '#ffffff' };
+  }
+};
+
 // 开始拖拽节点
 const startDrag = (event: MouseEvent, nodeType: string) => {
   event.preventDefault(); // 阻止默认行为
   if (lfRef.value) {
     let nodeText = '';
-    let nodeProperties = {};
     
     switch (nodeType) {
       case 'start':
@@ -293,7 +321,7 @@ const startDrag = (event: MouseEvent, nodeType: string) => {
     lfRef.value.dnd.startDrag({
       type: nodeType,
       text: nodeText,
-      properties: nodeProperties
+      properties: getDefaultPropertiesByNodeType(nodeType)
     });
   }
 };
@@ -333,14 +361,19 @@ const preview = () => {
 // 更新节点属性
 const updateNodeProperties = () => {
   if (selectedNode.value && lfRef.value) {
-    // 只对非开始和结束节点更新填充颜色
+    // 更新节点文本和颜色属性
+    const newProperties: any = {
+      text: nodeProperties.value.text
+    };
+    
+    // 只对非开始和结束节点更新颜色
     if (!['start', 'end'].includes(nodeProperties.value.type)) {
-      lfRef.value.setProperties(selectedNode.value.id, {
-        fillColor: nodeProperties.value.fillColor
-      });
+      newProperties.stroke = nodeProperties.value.stroke;
+      newProperties.fill = nodeProperties.value.fill;
     }
-
-    lfRef.value.setElementText(selectedNode.value.id, nodeProperties.value.text);
+    
+    lfRef.value.setProperties(selectedNode.value.id, newProperties);
+    
     message.success('属性已更新');
   }
 };
