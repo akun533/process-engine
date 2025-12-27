@@ -168,25 +168,50 @@ const data = ref({
   // 节点
   nodes: [
     {
-      id: 50,
-      type: 'rect',
+      id: 'start-node',
+      type: 'start',
       x: 100,
       y: 150,
-      text: '你好',
+      text: '开始',
     },
     {
-      id: 21,
-      type: 'circle',
-      x: 300,
+      id: 'task-node',
+      type: 'task',
+      x: 250,
       y: 150,
+      text: '任务',
+    },
+    {
+      id: 'decision-node',
+      type: 'decision',
+      x: 400,
+      y: 150,
+      text: '决策',
+    },
+    {
+      id: 'end-node',
+      type: 'end',
+      x: 550,
+      y: 150,
+      text: '结束',
     },
   ],
   // 边
   edges: [
     {
       type: 'polyline',
-      sourceNodeId: 50,
-      targetNodeId: 21,
+      sourceNodeId: 'start-node',
+      targetNodeId: 'task-node',
+    },
+    {
+      type: 'polyline',
+      sourceNodeId: 'task-node',
+      targetNodeId: 'decision-node',
+    },
+    {
+      type: 'polyline',
+      sourceNodeId: 'decision-node',
+      targetNodeId: 'end-node',
     },
   ],
 });
@@ -208,6 +233,9 @@ const initLogicFlow = () => {
       },
     });
 
+    // 注册自定义节点
+    registerNodes(lf);
+    
     lf.render(data.value);
     // 监听节点选择事件
     eventListener = lf.on('element:click', ({ data }: any) => {
@@ -221,9 +249,6 @@ const initLogicFlow = () => {
         };
       }
     });
-
-    // 注册自定义节点
-    registerNodes(lf);
 
     lfRef.value = lf;
     canUndo.value = lf.undoAble;
@@ -310,9 +335,12 @@ const preview = () => {
 // 更新节点属性
 const updateNodeProperties = () => {
   if (selectedNode.value && lfRef.value) {
-    lfRef.value.setProperties(selectedNode.value.id, {
-      fillColor: nodeProperties.value.fillColor
-    });
+    // 只对非开始和结束节点更新填充颜色
+    if (!['start', 'end'].includes(nodeProperties.value.type)) {
+      lfRef.value.setProperties(selectedNode.value.id, {
+        fillColor: nodeProperties.value.fillColor
+      });
+    }
 
     lfRef.value.setElementText(selectedNode.value.id, nodeProperties.value.text);
     message.success('属性已更新');
