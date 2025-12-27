@@ -239,15 +239,13 @@ const initLogicFlow = () => {
     lf.render(data.value);
     // 监听节点选择事件
     eventListener = lf.on('element:click', ({ data }: any) => {
-      if (data.type === 'node') {
-        selectedNode.value = data;
-        nodeProperties.value = {
-          id: data.id,
-          type: data.type,
-          text: data.text?.value || data.text || '',
-          fillColor: data.properties?.fillColor || '#ffffff'
-        };
-      }
+      selectedNode.value = data;
+      nodeProperties.value = {
+        id: data.id,
+        type: data.type,
+        text: data.text?.value || data.text || '',
+        fillColor: data.properties?.fillColor || '#ffffff'
+      };
     });
 
     lfRef.value = lf;
