@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: process-engine-backend
+  
+  # 数据源配置（使用 H2 内存数据库方便测试）
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    
+  # 如需使用 MySQL，取消以下注释并注释掉 H2 配置
+  #datasource:
+  #  driver-class-name: com.mysql.cj.jdbc.Driver
+  #  url: jdbc:mysql://localhost:3306/flowable?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+  #  username: root
+  #  password: root
+
+  # H2 控制台配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# Flowable 配置
+flowable:
+  # 自动部署流程定义
+  process-definition-location-prefix: classpath*:/processes/
+  # 数据库配置
+  database-schema-update: true
+  # 异步执行器配置
+  async-executor-activate: true
+  # 历史记录级别
+  history-level: full
+  # 检查流程定义
+  check-process-definitions: true
+  
+# MyBatis Plus 配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.process: DEBUG
+    org.flowable: DEBUG
