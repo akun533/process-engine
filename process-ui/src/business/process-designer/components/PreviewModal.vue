@@ -199,58 +199,63 @@ const updateNodeVisualStatus = (nodeId: string, status: string) => {
     status,
   });
 
-  // 使用CSS类来更新节点显示
+  // 使用DOM操作添加状态图标
   nextTick(() => {
-    const graphElement = previewLfRef.value?.graphModel.rootEl;
-    if (!graphElement) return;
-    
-    // 查找节点元素
-    const nodes = graphElement.querySelectorAll('.lf-node');
-    nodes.forEach((node: any) => {
-      const nodeData = node.__data__;
-      if (nodeData && nodeData.id === nodeId) {
-        // 移除所有状态类
-        node.classList.remove('node-status-running', 'node-status-failed', 'node-status-success');
-        
-        // 移除旧的状态图标
-        const oldIcon = node.querySelector('.node-status-icon');
-        if (oldIcon) {
-          oldIcon.remove();
-        }
-        
-        // 添加新的状态类和图标
-        if (status !== 'pending') {
-          node.classList.add(`node-status-${status}`);
-          
-          // 创建状态图标
-          const iconDiv = document.createElement('div');
-          iconDiv.className = 'node-status-icon';
-          
-          if (status === 'running') {
-            iconDiv.innerHTML = `
-              <svg class="status-icon-svg rotating" viewBox="0 0 1024 1024" width="20" height="20">
-                <circle cx="512" cy="512" r="400" fill="none" stroke="#1890ff" stroke-width="60" 
-                  stroke-dasharray="1256" stroke-dashoffset="314" stroke-linecap="round"/>
-              </svg>
-            `;
-          } else if (status === 'failed') {
-            iconDiv.innerHTML = `
-              <svg class="status-icon-svg" viewBox="0 0 1024 1024" width="20" height="20">
-                <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m165.4 618.2l-66-0.3L512 563.4l-99.3 118.4-66.1 0.3c-4.4 0-8-3.5-8-8 0-1.9 0.7-3.7 1.9-5.2l130.1-155L340.5 359a8.32 8.32 0 0 1-1.9-5.2c0-4.4 3.6-8 8-8l66.1 0.3L512 464.6l99.3-118.4 66-0.3c4.4 0 8 3.5 8 8 0 1.9-0.7 3.7-1.9 5.2L553.5 514l130 155c1.2 1.5 1.9 3.3 1.9 5.2 0 4.4-3.6 8-8 8z" fill="#ff4d4f"/>
-              </svg>
-            `;
-          } else if (status === 'success') {
-            iconDiv.innerHTML = `
-              <svg class="status-icon-svg" viewBox="0 0 1024 1024" width="20" height="20">
-                <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m193.5 301.7l-210.6 292a31.8 31.8 0 0 1-51.7 0L318.5 484.9c-3.8-5.3 0-12.7 6.5-12.7h46.9c10.2 0 19.9 4.9 25.9 13.3l71.2 98.8 157.2-218c6-8.3 15.6-13.3 25.9-13.3H699c6.5 0 10.3 7.4 6.5 12.7z" fill="#52c41a"/>
-              </svg>
-            `;
+    setTimeout(() => {
+      const container = previewContainerRef.value;
+      if (!container) return;
+      
+      // 查找所有 g 元素（LogicFlow 的节点容器）
+      const svgElements = container.querySelectorAll('g[data-node-id]');
+      
+      svgElements.forEach((element: any) => {
+        const dataNodeId = element.getAttribute('data-node-id');
+        if (dataNodeId === nodeId) {
+          // 移除旧的状态图标
+          const oldIcon = element.querySelector('.node-status-icon');
+          if (oldIcon) {
+            oldIcon.remove();
           }
           
-          node.appendChild(iconDiv);
+          // 添加新的状态图标
+          if (status !== 'pending') {
+            const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+            foreignObject.setAttribute('x', '40');
+            foreignObject.setAttribute('y', '-15');
+            foreignObject.setAttribute('width', '24');
+            foreignObject.setAttribute('height', '24');
+            foreignObject.setAttribute('class', 'node-status-icon');
+            
+            const div = document.createElement('div');
+            div.style.cssText = 'width: 24px; height: 24px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);';
+            
+            if (status === 'running') {
+              div.innerHTML = `
+                <svg class="rotating" viewBox="0 0 1024 1024" width="20" height="20">
+                  <circle cx="512" cy="512" r="400" fill="none" stroke="#1890ff" stroke-width="60" 
+                    stroke-dasharray="1256" stroke-dashoffset="314" stroke-linecap="round"/>
+                </svg>
+              `;
+            } else if (status === 'failed') {
+              div.innerHTML = `
+                <svg viewBox="0 0 1024 1024" width="20" height="20">
+                  <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m165.4 618.2l-66-0.3L512 563.4l-99.3 118.4-66.1 0.3c-4.4 0-8-3.5-8-8 0-1.9 0.7-3.7 1.9-5.2l130.1-155L340.5 359a8.32 8.32 0 0 1-1.9-5.2c0-4.4 3.6-8 8-8l66.1 0.3L512 464.6l99.3-118.4 66-0.3c4.4 0 8 3.5 8 8 0 1.9-0.7 3.7-1.9 5.2L553.5 514l130 155c1.2 1.5 1.9 3.3 1.9 5.2 0 4.4-3.6 8-8 8z" fill="#ff4d4f"/>
+                </svg>
+              `;
+            } else if (status === 'success') {
+              div.innerHTML = `
+                <svg viewBox="0 0 1024 1024" width="20" height="20">
+                  <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m193.5 301.7l-210.6 292a31.8 31.8 0 0 1-51.7 0L318.5 484.9c-3.8-5.3 0-12.7 6.5-12.7h46.9c10.2 0 19.9 4.9 25.9 13.3l71.2 98.8 157.2-218c6-8.3 15.6-13.3 25.9-13.3H699c6.5 0 10.3 7.4 6.5 12.7z" fill="#52c41a"/>
+                </svg>
+              `;
+            }
+            
+            foreignObject.appendChild(div);
+            element.appendChild(foreignObject);
+          }
         }
-      }
-    });
+      });
+    }, 100);
   });
 };
 
@@ -288,25 +293,6 @@ const handleClose = () => {
 .preview-table {
   height: 250px;
   overflow-y: auto;
-}
-
-:deep(.node-status-icon) {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 20px;
-  height: 20px;
-  z-index: 100;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-:deep(.status-icon-svg) {
-  display: block;
 }
 
 :deep(.rotating) {
